@@ -1,106 +1,256 @@
-# inteliDesk
+# InteliDesk 🧠🛡️
 
-A Motia project created with the **multi-language** starter template (TypeScript + Python).
+**AI-Assisted, Fraud-Aware Support Ticket Orchestration built with Motia**
 
-## What is Motia?
+InteliDesk is a production-grade backend system that models customer support tickets as long-running, resilient workflows. It automatically detects fraudulent or AI-generated complaints, resolves safe tickets using AI, escalates risky cases to humans, and enforces SLA — all using Motia's unified Steps runtime.
 
-Motia is an open-source, unified backend framework that eliminates runtime fragmentation by bringing **APIs, background jobs, queueing, streaming, state, workflows, AI agents, observability, scaling, and deployment** into one unified system using a single core primitive, the **Step**.
+---
 
-## Polyglot Architecture
+## 🚨 The Problem
 
-This template demonstrates Motia's polyglot capabilities by combining:
+Modern support systems struggle with:
 
-- **TypeScript**: API endpoint (`hello-api.step.ts`) - handles HTTP requests
-- **Python**: Event processor (`process_greeting_step.py`) - handles background processing
-- **JavaScript**: Logger (`log-greeting.step.js`) - handles workflow completion
+- **Ticket overload** – Too many requests, not enough agents
+- **AI-generated fake complaints & screenshots** – Hard to distinguish real from fake
+- **Costly refund abuse** – Fraudulent claims drain revenue
+- **Fragile cron + queue automations** – Complex infrastructure that breaks
+- **Poor observability** – No visibility into what's happening
 
-This shows how you can use the best language for each task while keeping everything in a single unified system.
+Most backends treat tickets as database rows. In reality, **tickets are long-running processes** involving time, retries, failures, and human interaction.
 
-## Quick Start
+---
+
+## ✅ The Solution
+
+InteliDesk treats every ticket as a **durable workflow**, not a CRUD record. With Motia:
+
+- **APIs, background jobs, AI, cron, streaming** → one unified runtime
+- **No queues, no workers, no glue code** – Everything is a Step
+- **Every ticket has a visible execution trace** – Full observability
+
+---
+
+## 🧠 Key Features
+
+### 🔍 AI Proof Authenticity Detection
+
+- Detects AI-generated complaint text
+- Flags suspicious screenshots / proofs
+- Routes risky tickets instead of auto-refunding
+
+### 🤖 Controlled AI Automation
+
+- AI classifies intent & confidence
+- Deterministic routing logic decides:
+  - Auto-resolve
+  - Human escalation
+- **No blind AI decisions** – Rules layer on top
+
+### ⏱️ Built-in SLA Enforcement
+
+- SLA tracked automatically per ticket
+- Cron step escalates stalled tickets
+- No polling, no external schedulers
+
+### 👤 Human-in-the-Loop
+
+- Only risky or ambiguous tickets reach agents
+- Clean separation between AI and humans
+- Agents see full context & execution trace
+
+### 📡 Real-Time Streaming
+
+- Live ticket updates for dashboards
+- No polling required
+- Built-in SSE streams
+
+---
+
+## 🧩 Architecture Overview
+
+```
+API (Create Ticket)
+        ↓
+   Validate Input
+        ↓
+Detect Proof Authenticity (Python)
+        ↓
+  Classify Intent (Python)
+        ↓
+   Decision Routing
+    ├─ Auto Resolve
+    └─ Human Escalation
+        ↓
+   Finalize Ticket
+
+Parallel: SLA Watcher (Cron)
+Streaming: ticket-updates
+```
+
+---
+
+## 🛠️ Tech Stack
+
+- **Motia** – Unified backend runtime
+- **TypeScript** – APIs, orchestration, workflows
+- **Python** – AI & ML-heavy steps
+- **Zod / Pydantic** – Validation
+- **SSE Streams** – Real-time updates
+
+---
+
+## 🚀 Running Locally
 
 ```bash
-# Start the development server
+# Install dependencies
+npm install
+
+# Start development server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
+
+# Generate types
+npx motia generate-types
 ```
 
-This starts the Motia runtime and the **Workbench** - a powerful UI for developing and debugging your workflows. By default, it's available at [`http://localhost:3000`](http://localhost:3000).
+---
 
-```bash
-# Test your first endpoint
-curl http://localhost:3000/hello
-```
+## 📊 Observability
 
-## How It Works
+Every ticket has:
 
-1. **TypeScript API Step** receives the HTTP request at `/hello`
-2. It emits a `process-greeting` event with the request data
-3. **Python Event Step** picks up the event, processes it, and stores the result in state
-4. Python emits a `greeting-processed` event
-5. **JavaScript Event Step** logs the completed workflow
+- ✅ A full execution trace
+- ✅ Step-level logs
+- ✅ Retry & failure visibility
+- ✅ SLA breach tracking
 
-## Step Types
+> _"Every ticket is not a row in a database — it's a traceable execution."_
 
-Every Step has a `type` that defines how it triggers:
+---
 
-| Type | When it runs | Use case |
-|------|--------------|----------|
-| **`api`** | HTTP request | REST APIs, webhooks |
-| **`event`** | Event emitted | Background jobs, workflows |
-| **`cron`** | Schedule | Cleanup, reports, reminders |
-
-## Development Commands
-
-```bash
-# Start Workbench and development server
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-
-# Start production server (without hot reload)
-npm run start
-# or
-yarn start
-# or
-pnpm start
-
-# Generate TypeScript types from Step configs
-npm run generate-types
-# or
-yarn generate-types
-# or
-pnpm generate-types
-
-# Build project for deployment
-npm run build
-# or
-yarn build
-# or
-pnpm build
-```
-
-## Project Structure
+## 🏗️ Project Structure
 
 ```
-steps/                           # Your Step definitions
-├── hello/
-│   ├── hello-api.step.ts       # TypeScript API endpoint
-│   ├── process_greeting_step.py # Python event processor
-│   └── log-greeting.step.js    # JavaScript logger
-motia.config.ts                  # Motia configuration
-requirements.txt                 # Python dependencies
+intelidesk/
+├── src/
+│ ├── api/ # Public API endpoints (ticket creation, user replies)
+│ │ ├── create-ticket.step.ts
+│ │ └── user-reply.step.ts
+│ │
+│ ├── workflows/ # High-level workflow definitions (ticket lifecycle)
+│ │ └── ticket-workflow.ts
+│ │
+│ ├── steps/ # Atomic workflow steps (Motia Steps)
+│ │ ├── typescript/ # Orchestration & business logic (TS)
+│ │ │ ├── validate-input.step.ts
+│ │ │ ├── route-decision.step.ts
+│ │ │ ├── auto-resolve.step.ts
+│ │ │ ├── escalate-human.step.ts
+│ │ │ ├── finalize-ticket.step.ts
+│ │ │ └── sla-watcher.step.ts
+│ │ │
+│ │ └── python/ # AI / ML steps (Python)
+│ │ ├── detect-proof-authenticity.step.py
+│ │ └── classify-intent.step.py
+│ │
+│ ├── streams/ # Real-time Server-Sent Events (SSE)
+│ │ └── ticket-updates.stream.ts
+│ │
+│ ├── types/ # Shared domain types & constants
+│ │ ├── ticket.types.ts
+│ │ ├── ticket.status.ts
+│ │ └── ticket.constants.ts
+│
+├── motia.config.ts # Motia runtime configuration
+├── package.json # Project dependencies & scripts
+├── tsconfig.json # TypeScript configuration
+└── README.md # Project documentation
 ```
 
-Steps are auto-discovered from your `steps/` or `src/` directories - no manual registration required.
+---
 
-## Learn More
+### 💡 Why this structure works well
 
-- [Documentation](https://motia.dev/docs) - Complete guides and API reference
-- [Quick Start Guide](https://motia.dev/docs/getting-started/quick-start) - Detailed getting started tutorial
-- [Core Concepts](https://motia.dev/docs/concepts/overview) - Learn about Steps and Motia architecture
-- [Discord Community](https://discord.gg/motia) - Get help and connect with other developers
+- **Clear separation of concerns**
+  - APIs ≠ workflows ≠ steps
+- **Polyglot-friendly**
+  - TypeScript for orchestration
+  - Python for AI/ML
+- **Motia-native**
+  - Steps are atomic and observable
+  - Streams are first-class
+- **Hackathon-judge friendly**
+  - Easy to understand
+  - Easy to review
+  - Looks production-ready
+
+If you want, I can also:
+
+- Simplify this further (if you want fewer folders)
+- Align it _exactly_ with Motia’s default discovery rules
+- Add a short “Structure Explained” section for README
+
+Just tell me 👍
+
+---
+
+## 📝 Example: Creating a Ticket
+
+```typescript
+POST /api/tickets
+Content-Type: application/json
+
+{
+  "customerId": "cust_123",
+  "subject": "Damaged product received",
+  "description": "The item arrived broken...",
+  "proofUrls": ["https://example.com/image.jpg"],
+  "priority": "high"
+}
+```
+
+**Response:**
+
+```json
+{
+  "ticketId": "ticket_abc123",
+  "status": "processing",
+  "workflowId": "wf_xyz789"
+}
+```
+
+---
+
+## 🔐 Security & Fraud Detection
+
+InteliDesk uses multi-layer fraud detection:
+
+1. **Text Analysis** – Detects GPT-generated complaints
+2. **Image Verification** – Flags AI-generated or manipulated screenshots
+3. **Pattern Recognition** – Identifies repeat offenders
+4. **Confidence Scoring** – Only high-confidence cases auto-resolve
+
+---
+
+## 🎯 Roadmap
+
+- [ ] Multi-language support
+- [ ] Advanced analytics dashboard
+- [ ] Integration with popular helpdesk tools
+- [ ] Custom AI model fine-tuning
+- [ ] Mobile app for agents
+
+---
+
+## 📄 License
+
+MIT License - See LICENSE file for details
+
+---
+
+## 📧 Contact
+
+For questions or support, reach out at: support@intelidesk.example.com
+
+---
+
+**Built with ❤️ using Motia**
