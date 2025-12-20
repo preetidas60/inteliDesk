@@ -231,26 +231,4 @@ InteliDesk uses multi-layer fraud detection:
 
 ---
 
-## 🎯 Roadmap
-
-- [ ] Multi-language support
-- [ ] Advanced analytics dashboard
-- [ ] Integration with popular helpdesk tools
-- [ ] Custom AI model fine-tuning
-- [ ] Mobile app for agents
-
----
-
-## 📄 License
-
-MIT License - See LICENSE file for details
-
----
-
-## 📧 Contact
-
-For questions or support, reach out at: support@intelidesk.example.com
-
----
-
 **Built with ❤️ using Motia**
